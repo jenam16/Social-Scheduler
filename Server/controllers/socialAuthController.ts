@@ -6,6 +6,7 @@ import {Request , Response} from "express";
 import { User } from "../models/user.js";
 import zernio from "../config/zernio.js";
 import { Account } from "../models/account.js";
+import { AuthRequest } from "../middlewares/authMiddleware.js";
 
 
 const getOrCreateZernioProfile = async (user:any) : Promise<string> =>{
@@ -39,7 +40,7 @@ const profiles: any[] = Array.isArray(data) ? data:data?.profiles || data?.data 
     }
 } 
 
-export const generateAuthUrl = async (req:Request,res:Response) : Promise<void>=>{
+export const generateAuthUrl = async (req:AuthRequest,res:Response) : Promise<void>=>{
   try{
  const {platform} = req.params;
 const profileId = await getOrCreateZernioProfile((req as any).user);
@@ -71,7 +72,7 @@ res.status(500).json({message:error?.message || "server error"})
 // sync connected accounts from zernio into mongodb 
 //GET /api/auth/sync
 
-export const syncAccounts = async (req:Request , res:Response) : Promise<void>=>{
+export const syncAccounts = async (req:AuthRequest , res:Response) : Promise<void>=>{
     try{
         const profileId = await getOrCreateZernioProfile((req as any).user);
         const result = await zernio.accounts.listAccounts({
